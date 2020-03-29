@@ -5,9 +5,6 @@
 body{
   font-size: 10px;
 }
-pre{
-  margin: 0;
-}
 .input{
   width: 997px;
   height: 200px;
@@ -45,7 +42,7 @@ pre{
   width: 13%;
 }
 .key_extra {
-  width: 39%;
+  width: 32%;
   max-width: 500px;
   color: gray;
 }
@@ -53,7 +50,11 @@ pre{
   background-color: darkgray;
 }
 .key:active{
-  background-color: rgba(255, 255, 255, 0.12);;
+  background-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+.key_active{
+  background-color: deepskyblue;
 }
 .pressed{
   position: relative;
