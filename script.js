@@ -159,7 +159,7 @@ const KEYS = [
     id: 'Slash', valEng: '/', altEng: '?', valRus: '.', altRus: ',',
   },
   {
-    id: 'arrowUp', valEng: '\u02c4', altEng: ' ', valRus: '\u02c4', altRus: ' ',
+    id: 'ArrowUp', valEng: '\u02c4', altEng: ' ', valRus: '\u02c4', altRus: ' ',
   },
   {
     id: 'ShiftRight', valEng: 'Shift', altEng: ' ', valRus: 'Shift', altRus: ' ', type: 'special',
@@ -268,6 +268,15 @@ const KEYBOARD = {
           });
           break;
 
+        case 'Tab':
+          keyboardElement.addEventListener('click', () => {
+            document.querySelector('.input').value += '    ';
+            this.elements.input.focus();
+            this.properties.cursor += 4;
+            this.elements.input.selectionStart = this.properties.cursor;
+          });
+          break;
+
         case 'Lang':
           keyboardElement.addEventListener('click', () => {
             document.querySelectorAll('.key').forEach((elem) => {
@@ -300,20 +309,42 @@ const KEYBOARD = {
       }
 
       if (lang === 'eng') {
+        keyboardElement.setAttribute('value', key.valEng);
+        keyboardElement.setAttribute('name', key.altEng);
         keyboardElement.innerHTML = `<span>${key.altEng} <br> ${key.valEng.toUpperCase()}</span>`;
-      } else keyboardElement.innerHTML = `<span>${key.altRus} <br> ${key.valRus.toUpperCase()}</span>`;
+      } else {
+        keyboardElement.setAttribute('value', key.valRus);
+        keyboardElement.setAttribute('name', key.altRus);
+        keyboardElement.innerHTML = `<span>${key.altRus} <br> ${key.valRus.toUpperCase()}</span>`;
+      }
 
       keyboardElement.id = key.id;
 
       this.elements.keysContainer.append(keyboardElement);
-
     });
   },
 
   changeLang() {
     if (this.properties.lang === 'eng') this.properties.lang = 'rus';
     else this.properties.lang = 'eng';
+    this.createNewState();
+    this.saveLang();
+  },
+
+  createNewState() {
+    document.querySelectorAll('.key').forEach((elem) => {
+      elem.remove();
+    });
     this.createKeys(KEYS, this.properties.lang);
+  },
+
+  saveLang() {
+    sessionStorage.setItem('lang', this.properties.lang);
+  },
+  restoreLang() {
+    if (sessionStorage.getItem('lang')) {
+      this.properties.lang = sessionStorage.getItem('lang');
+    } else this.properties.lang = 'eng';
   },
 
   clickShift() {
@@ -339,12 +370,79 @@ const KEYBOARD = {
     this.elements.section.append(this.elements.keysContainer);
     document.body.append(this.elements.section);
 
-    // document.addEventListener('keydown', keyDown());
+    this.runOnKeys();
+  },
+
+  runOnKeys() {
+    const pressed = new Set();
+    document.addEventListener('keydown', (event) => {
+      event.preventDefault();
+      const keysDown = document.querySelectorAll('.key');
+      keysDown.forEach((key) => {
+        if (event.code === key.id) {
+          key.classList.add('key_active');
+          switch (event.code) {
+            case 'Space':
+              document.querySelector('.input').value += ' ';
+              break;
+            case 'Backspace':
+              document.querySelector('.input').value = document.querySelector('.input').value.substring(0, document.querySelector('.input').value.length - 1);
+              break;
+            case 'CapsLock':
+              this.pickCaps();
+              break;
+            case 'Enter':
+              document.querySelector('.input').value += '\n';
+              break;
+            case 'ShiftLeft':
+              this.clickShift();
+              break;
+            case 'ShiftRight':
+              this.clickShift();
+              break;
+            case 'Tab':
+              document.querySelector('.input').value += '    ';
+              break;
+            default:
+              if (event.code === 'ControlLeft' || event.code === 'ControlRight' || event.code === 'AltLeft' || event.code === 'AltRight') {
+                document.querySelector('.input').value += '';
+              } else if (this.properties.capsLock) {
+                document.querySelector('.input').value += key.value.toUpperCase();
+              } else if (this.properties.shift) {
+                if (key.name !== ' ') document.querySelector('.input').value += key.name;
+                else document.querySelector('.input').value += key.value.toUpperCase();
+              } else document.querySelector('.input').value += key.value.toLowerCase();
+          }
+        }
+      });
+
+      pressed.add(event.code);
+      if (pressed.has('ShiftLeft') && pressed.has('ControlLeft')) KEYBOARD.changeLang();
+    });
+    document.addEventListener('keyup', (event) => {
+      const keysDown = document.querySelectorAll('.key');
+      keysDown.forEach((key) => {
+        if (event.code === key.id) {
+          if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+            this.clickShift();
+            key.classList.toggle('key_active', this.properties.shift);
+          } else if (event.code === 'CapsLock') {
+            key.classList.toggle('key_active', this.properties.capsLock);
+          } else key.classList.remove('key_active');
+        }
+      });
+      pressed.delete(event.code);
+    });
   },
 };
 
 window.onload = () => {
   KEYBOARD.createBase();
+  KEYBOARD.restoreLang();
   KEYBOARD.createKeys(KEYS, KEYBOARD.properties.lang);
   KEYBOARD.elements.keys = KEYBOARD.elements.keysContainer.querySelectorAll('.key');
 };
+
+
+// TODO: del, alt, ctrl
+// TODO: refactoring
