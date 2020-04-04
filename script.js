@@ -277,6 +277,17 @@ const KEYBOARD = {
           });
           break;
 
+        case 'Delete':
+          keyboardElement.addEventListener('click', () => {
+            let beforeText = document.querySelector('.input').value.slice(0, this.getCursorPosition(document.querySelector('.input')));
+            let afterText = document.querySelector('.input').value.slice(this.getCursorPosition(document.querySelector('.input')));
+            document.querySelector('.input').value = beforeText + afterText.slice(1);
+            this.elements.input.focus();
+            this.properties.cursor = this.getCursorPosition(document.querySelector('.input'));
+            this.elements.input.selectionStart = this.properties.cursor;
+          });
+          break;
+
         case 'Lang':
           keyboardElement.addEventListener('click', () => {
             document.querySelectorAll('.key').forEach((elem) => {
@@ -291,7 +302,9 @@ const KEYBOARD = {
             const keyVal = this.properties.lang === 'eng' ? key.valEng : key.valRus;
             const keyAlt = this.properties.lang === 'eng' ? key.altEng : key.altRus;
 
-            if (this.properties.capsLock) {
+            if (key.id === 'ControlLeft' || key.id === 'ControlRight' || key.id === 'AltLeft' || key.id === 'AltRight') {
+              document.querySelector('.input').value += '';
+            } else if (this.properties.capsLock) {
               document.querySelector('.input').value += keyVal.toUpperCase();
             } else if (this.properties.shift) {
               if (keyAlt !== ' ') document.querySelector('.input').value += keyAlt;
@@ -322,6 +335,18 @@ const KEYBOARD = {
 
       this.elements.keysContainer.append(keyboardElement);
     });
+  },
+
+  getCursorPosition(ctrl) {
+    let CaretPos = this.properties.cursor;
+    if (document.selection) {
+      let Sel = document.selection.createRange();
+      Sel.moveStart('character', -ctrl.value.length);
+      CaretPos = Sel.text.length;
+    } else if (ctrl.selectionStart || ctrl.selectionStart === '0') {
+      CaretPos = ctrl.selectionStart;
+    }
+    return CaretPos;
   },
 
   changeLang() {
@@ -444,5 +469,4 @@ window.onload = () => {
 };
 
 
-// TODO: del, alt, ctrl
 // TODO: refactoring
