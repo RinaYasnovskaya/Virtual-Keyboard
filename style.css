@@ -1,9 +1,6 @@
-/* *{
-  margin: 0;
-  padding: 0;
-} */
+
 body{
-  font-size: 10px;
+  font: 400 16px Arial;
 }
 .input{
   width: 997px;
@@ -33,7 +30,8 @@ body{
   user-select: none;
   cursor: pointer;
   outline: none;
-  box-shadow: 0 2px 2px rgba(0,0,0,0.5);;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.5);
+  font: 300 12px Arial;
 }
 .key_little{
   width: 7%;
@@ -47,18 +45,19 @@ body{
   color: gray;
 }
 .key:hover{
+  transition: all 600ms ease;
   background-color: darkgray;
 }
-.key:active{
+ .key:active{
   background-color: rgba(255, 255, 255, 0.12);
   box-shadow: none;
-}
+  color: wheat;
+} 
 .key_active{
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: darkturquoise;
   box-shadow: none;
-}
-.key_active{
-  background-color: deepskyblue;
+  color: wheat;
+  transition: all 600ms ease;
 }
 .pressed{
   position: relative;
