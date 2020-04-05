@@ -204,7 +204,6 @@ const KEYBOARD = {
     capsLock: false,
     shift: false,
     lang: 'eng',
-    cursor: 0,
   },
 
   createKeys(keys, lang) {
@@ -235,14 +234,12 @@ const KEYBOARD = {
       this.elements.keysContainer.append(keyboardElement);
     });
   },
-
   changeLang() {
     if (this.properties.lang === 'eng') this.properties.lang = 'rus';
     else this.properties.lang = 'eng';
     this.createNewState();
     this.saveLang();
   },
-
   createNewState() {
     document.querySelectorAll('.key').forEach((elem) => {
       elem.remove();
@@ -250,7 +247,6 @@ const KEYBOARD = {
     this.createKeys(KEYS, this.properties.lang);
     this.properties.shift = false;
   },
-
   saveLang() {
     sessionStorage.setItem('lang', this.properties.lang);
   },
@@ -259,12 +255,12 @@ const KEYBOARD = {
       this.properties.lang = sessionStorage.getItem('lang');
     } else this.properties.lang = 'eng';
   },
-
   createBase() {
     this.elements.input = document.createElement('textarea');
     this.elements.section = document.createElement('section');
     this.elements.keysContainer = document.createElement('div');
-    this.properties.cursor = this.elements.input.selectionStart;
+    const text = document.createElement('p');
+    text.innerText = 'Клавиатура создана в операционной системе Windows \n Для переключения языка комбинация: левыe shift + ctrl';
 
     this.elements.input.classList.add('input');
     this.elements.input.setAttribute('autofocus', 'true');
@@ -275,10 +271,11 @@ const KEYBOARD = {
     document.body.append(this.elements.input);
     this.elements.section.append(this.elements.keysContainer);
     document.body.append(this.elements.section);
+    document.body.append(text);
   },
-
   keyBackspace() {
-    this.elements.input.value = this.elements.input.value.substring(0, this.elements.input.value.length - 1);
+    const inpuT = this.elements.input;
+    inpuT.value = inpuT.value.substring(0, inpuT.value.length - 1);
     this.elements.input.focus();
   },
   keyCapsLock() {
@@ -302,7 +299,6 @@ const KEYBOARD = {
   keyDelete() {
     this.elements.input.setRangeText('', this.elements.input.selectionStart, this.elements.input.selectionEnd + 1);
   },
-
   clickKeyboard() {
     const pressed = new Set();
     this.elements.keysContainer.addEventListener('mousedown', (event) => {
@@ -354,7 +350,6 @@ const KEYBOARD = {
       pressed.delete(event.target.id);
     });
   },
-
   animationButton(keyPress, bool) {
     const keyAnim = document.getElementById(`${keyPress}`);
     if (bool) {
