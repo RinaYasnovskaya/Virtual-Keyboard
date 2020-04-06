@@ -254,7 +254,7 @@ const KEYBOARD = {
     this.elements.section = document.createElement('section');
     this.elements.keysContainer = document.createElement('div');
     const text = document.createElement('p');
-    text.innerText = 'Клавиатура создана в операционной системе Windows \n Для переключения языка комбинация: левыe shift + ctrl';
+    text.innerText = 'Клавиатура создана в операционной системе Windows \n Для переключения языка комбинация: левыe shift + ctrl \n Shift зажимается для удобства ввода';
 
     center.classList.add('center-block');
     this.elements.input.classList.add('input');
