@@ -15,7 +15,7 @@ body{
 .wrapper{
   width: 1003px;
   height: 282px;
-  background-color: #df7861;
+  background-color: #af7470;
   box-sizing: border-box;
   padding: 12px;
   border-radius: 35px;
@@ -32,7 +32,7 @@ body{
   margin: 3px;
   border-radius: 10px 3px 10px 3px;
   border: none;
-  background-color: #ecb390;
+  background-color: #e9b9b6;
   user-select: none;
   cursor: pointer;
   outline: none;
@@ -52,15 +52,14 @@ body{
 }
 .key:hover{
   transition: all 600ms ease;
-  background-color: #ecdfc8;
+  background-color: #c27f7a;
 }
  .key:active{
-  background-color: rgba(255, 255, 255, 0.12);
   box-shadow: none;
   color: wheat;
 } 
 .key_active{
-  background-color: #b7472a;
+  background-color: #794a46;
   box-shadow: none;
   color: wheat;
   transition: all 600ms ease;
@@ -72,3 +71,6 @@ body{
 p{
   font-family: monospace;
 }
+/* .key-special{
+  background-color: #c99c98;
+} */

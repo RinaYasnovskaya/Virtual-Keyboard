@@ -84,7 +84,7 @@ const KEYS = [
     id: 'Backslash', valEng: '\\', altEng: '|', valRus: '\\', altRus: '/',
   },
   {
-    id: 'Delete', valEng: 'DEL', altEng: ' ', valRus: 'DEL', altRus: ' ',
+    id: 'Delete', valEng: 'DEL', altEng: ' ', valRus: 'DEL', altRus: ' ', type: 'special-del',
   },
   {
     id: 'CapsLock', valEng: 'CAPS LOCK', altEng: ' ', valRus: 'CAPS LOCK', altRus: ' ', type: 'special',
@@ -159,7 +159,7 @@ const KEYS = [
     id: 'Slash', valEng: '/', altEng: '?', valRus: '.', altRus: ',',
   },
   {
-    id: 'ArrowUp', valEng: '\u02c4', altEng: ' ', valRus: '\u02c4', altRus: ' ',
+    id: 'ArrowUp', valEng: '\u02c4', altEng: ' ', valRus: '\u02c4', altRus: ' ', type: 'special-arrow',
   },
   {
     id: 'ShiftRight', valEng: 'SHIFT', altEng: ' ', valRus: 'SHIFT', altRus: ' ', type: 'special',
@@ -168,31 +168,30 @@ const KEYS = [
     id: 'ControlLeft', valEng: 'CTRL', altEng: ' ', valRus: 'CTRL', altRus: ' ', type: 'special',
   },
   {
-    id: 'Meta', valEng: 'WIN', altEng: ' ', valRus: 'WIN', altRus: ' ',
+    id: 'Meta', valEng: 'WIN', altEng: ' ', valRus: 'WIN', altRus: ' ', type: 'special-win',
   },
   {
-    id: 'AltLeft', valEng: 'ALT', altEng: ' ', valRus: 'ALT', altRus: ' ',
+    id: 'AltLeft', valEng: 'ALT', altEng: ' ', valRus: 'ALT', altRus: ' ', type: 'special-alt',
   },
   {
     id: 'Space', valEng: 'space', altEng: ' ', valRus: 'space', altRus: ' ', type: 'special-space',
   },
   {
-    id: 'AltRight', valEng: 'ALT', altEng: ' ', valRus: 'ALT', altRus: ' ',
+    id: 'AltRight', valEng: 'ALT', altEng: ' ', valRus: 'ALT', altRus: ' ', type: 'special-alt',
   },
   {
     id: 'ControlRight', valEng: 'CTRL', altEng: ' ', valRus: 'CTRL', altRus: ' ', type: 'special',
   },
   {
-    id: 'ArrowLeft', valEng: '\u02c2', altEng: ' ', valRus: '\u02c2', altRus: ' ',
+    id: 'ArrowLeft', valEng: '\u02c2', altEng: ' ', valRus: '\u02c2', altRus: ' ', type: 'special-arrow',
   },
   {
-    id: 'ArrowDown', valEng: '\u02c5', altEng: ' ', valRus: '\u02c5', altRus: ' ',
+    id: 'ArrowDown', valEng: '\u02c5', altEng: ' ', valRus: '\u02c5', altRus: ' ', type: 'special-arrow',
   },
   {
-    id: 'ArrowRight', valEng: '\u02c3', altEng: ' ', valRus: '\u02c3', altRus: ' ',
+    id: 'ArrowRight', valEng: '\u02c3', altEng: ' ', valRus: '\u02c3', altRus: ' ', type: 'special-arrow',
   },
 ];
-
 const KEYBOARD = {
   elements: {
     section: null,
@@ -205,20 +204,16 @@ const KEYBOARD = {
     shift: false,
     lang: 'eng',
   },
-
   createKeys(keys, lang) {
     keys.forEach((key) => {
       const keyboardElement = document.createElement('button');
-
       keyboardElement.setAttribute('type', 'button');
       keyboardElement.classList.add('key');
-
       if (key.type === 'special') {
-        keyboardElement.classList.add('key_middle');
+        keyboardElement.classList.add('key_middle', 'key-special');
       } else if (key.type === 'special-space') {
         keyboardElement.classList.add('key_extra');
       }
-
       if (lang === 'eng') {
         keyboardElement.setAttribute('value', key.valEng);
         keyboardElement.setAttribute('name', key.altEng);
@@ -228,9 +223,7 @@ const KEYBOARD = {
         keyboardElement.setAttribute('name', key.altRus);
         keyboardElement.innerHTML = `<span>${key.altRus} <br> ${key.valRus}</span>`;
       }
-
       keyboardElement.id = key.id;
-
       this.elements.keysContainer.append(keyboardElement);
     });
   },
@@ -302,7 +295,7 @@ const KEYBOARD = {
     this.elements.input.focus();
   },
   keyDelete() {
-    this.elements.input.setRangeText('', this.elements.input.selectionStart, this.elements.input.selectionEnd + 1);
+    this.elements.input.setRangeText('', this.elements.input.selectionStart, this.elements.input.selectionEnd + 1, 'start');
   },
   clickKeyboard() {
     const pressed = new Set();
@@ -341,8 +334,6 @@ const KEYBOARD = {
             if (event.target.name !== ' ') this.elements.input.value += event.target.name;
             else this.elements.input.value += event.target.value.toUpperCase();
           } else this.elements.input.value += event.target.value;
-
-          this.elements.input.focus();
       }
       pressed.add(event.target.id);
       const shift = document.getElementById('ShiftLeft').classList;
@@ -355,7 +346,7 @@ const KEYBOARD = {
   animationButton(keyPress, bool) {
     const keyAnim = document.getElementById(`${keyPress}`);
     if (bool) {
-      keyAnim.style.backgroundColor = '#b7472a';
+      keyAnim.style.backgroundColor = '#794a46';
       keyAnim.style.boxShadow = 'none';
       keyAnim.style.color = '#df7861';
       keyAnim.style.transition = 'all 600ms ease';
@@ -434,7 +425,6 @@ const KEYBOARD = {
     });
   },
 };
-
 window.onload = () => {
   KEYBOARD.createBase();
   KEYBOARD.restoreLang();
