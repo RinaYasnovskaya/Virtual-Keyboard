@@ -370,100 +370,45 @@ const KEYBOARD = {
     const pressed = new Set();
     document.addEventListener('keydown', (event) => {
       event.preventDefault();
-      if (this.properties.lang === 'eng') {
-        this.elements.keys.forEach((key) => {
-          if (event.code === key.id) {
-            this.animationButton(event.code, true);
-            KEYS.forEach((elem) => {
-              if (event.code === elem.id) {
-                switch (event.code) {
-                  case 'Tab':
-                    this.keyTab();
-                    break;
-                  case 'Space':
-                    this.keySpace();
-                    break;
-                  case 'Enter':
-                    this.keyEnter();
-                    break;
-                  case 'Backspace':
-                    this.keyBackspace();
-                    break;
-                  case 'CapsLock':
-                    this.keyCapsLock();
-                    document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.capsLock);
-                    break;
-                  case 'ShiftLeft':
-                  case 'ShiftRight':
-                    this.keyShift();
-                    document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.shift);
-                    break;
-                  case 'Delete':
-                    this.keyDelete();
-                    break;
-                  default:
-                    if (event.code === 'ControlLeft' || event.code === 'ControlRight' || event.code === 'AltLeft' || event.code === 'AltRight') {
-                      this.elements.input.value += '';
-                    } else if (this.properties.capsLock) {
-                      this.elements.input.value += elem.valEng.toUpperCase();
-                    } else if (this.properties.shift) {
-                      if (key.name !== ' ') this.elements.input.value += elem.altEng;
-                      else this.elements.input.value += elem.valEng.toUpperCase();
-                    } else this.elements.input.value += elem.valEng;
+      this.elements.keys.forEach((key) => {
+        if (event.code === key.id) {
+          this.animationButton(event.code, true);
+          KEYS.forEach((elem) => {
+            if (event.code === elem.id) {
+              if (event.code === 'Tab') this.keyTab();
+              else if (event.code === 'Space') this.keySpace();
+              else if (event.code === 'Enter') this.keyEnter();
+              else if (event.code === 'Backspace') this.keyBackspace();
+              else if (event.code === 'CapsLock') {
+                this.keyCapsLock();
+                document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.capsLock);
+              } else if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+                this.keyShift();
+                document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.shift);
+              } else if (event.code === 'Delete') this.keyDelete();
+              else {
+                let keyVal = '';
+                let keyAlt = '';
+                if (this.properties.lang === 'eng') {
+                  keyVal = elem.valEng;
+                  keyAlt = elem.altEng;
+                } else {
+                  keyVal = elem.valRus;
+                  keyAlt = elem.altRus;
                 }
+                if (event.code === 'ControlLeft' || event.code === 'ControlRight' || event.code === 'AltLeft' || event.code === 'AltRight') {
+                  this.elements.input.value += '';
+                } else if (this.properties.capsLock) {
+                  this.elements.input.value += keyVal.toUpperCase();
+                } else if (this.properties.shift) {
+                  if (key.name !== ' ') this.elements.input.value += keyAlt;
+                  else this.elements.input.value += keyVal.toUpperCase();
+                } else this.elements.input.value += keyVal;
               }
-            });
-          }
-        });
-      } else {
-        this.elements.keys.forEach((keyEl) => {
-          if (event.code === keyEl.id) {
-            this.animationButton(event.code, true);
-            KEYS.forEach((elem) => {
-              if (event.code === elem.id) {
-                switch (event.code) {
-                  case 'Tab':
-                    this.keyTab();
-                    break;
-                  case 'Space':
-                    this.keySpace();
-                    break;
-                  case 'Enter':
-                    this.keyEnter();
-                    break;
-                  case 'Backspace':
-                    this.keyBackspace();
-                    break;
-                  case 'CapsLock':
-                    this.keyCapsLock();
-                    document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.capsLock);
-                    break;
-                  case 'ShiftLeft':
-                    this.keyShift();
-                    document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.shift);
-                    break;
-                  case 'ShiftRight':
-                    this.keyShift();
-                    document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.shift);
-                    break;
-                  case 'Delete':
-                    this.keyDelete();
-                    break;
-                  default:
-                    if (event.code === 'ControlLeft' || event.code === 'ControlRight' || event.code === 'AltLeft' || event.code === 'AltRight') {
-                      this.elements.input.value += '';
-                    } else if (this.properties.capsLock) {
-                      this.elements.input.value += elem.valRus.toUpperCase();
-                    } else if (this.properties.shift) {
-                      if (keyEl.name !== ' ') this.elements.input.value += elem.altRus;
-                      else this.elements.input.value += elem.valRus.toUpperCase();
-                    } else this.elements.input.value += elem.valRus;
-                }
-              }
-            });
-          }
-        });
-      }
+            }
+          });
+        }
+      });
       pressed.add(event.code);
       if (pressed.has('ShiftLeft') && pressed.has('ControlLeft')) this.changeLang();
     });
@@ -477,7 +422,7 @@ const KEYBOARD = {
     });
   },
   toUpAndLow() {
-    this.elements.keys.forEach((elem) => {
+    document.querySelectorAll('.key').forEach((elem) => {
       const elemID = elem.id.slice(0, 3);
       if (elemID === 'Key') {
         if (KEYBOARD.properties.shift || KEYBOARD.properties.capsLock) {
