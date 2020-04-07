@@ -165,10 +165,13 @@ const KEYS = [
     id: 'ShiftRight', valEng: 'SHIFT', altEng: ' ', valRus: 'SHIFT', altRus: ' ', type: 'special',
   },
   {
-    id: 'ControlLeft', valEng: 'CTRL', altEng: ' ', valRus: 'CTRL', altRus: ' ', type: 'special',
+    id: 'ControlLeft', valEng: 'CTRL', altEng: ' ', valRus: 'CTRL', altRus: ' ', type: 'special-ctrl',
   },
   {
     id: 'Meta', valEng: 'WIN', altEng: ' ', valRus: 'WIN', altRus: ' ', type: 'special-win',
+  },
+  {
+    id: 'LANG', valEng: 'ENG', altEng: ' ', valRus: 'RUS', altRus: ' ',
   },
   {
     id: 'AltLeft', valEng: 'ALT', altEng: ' ', valRus: 'ALT', altRus: ' ', type: 'special-alt',
@@ -180,7 +183,7 @@ const KEYS = [
     id: 'AltRight', valEng: 'ALT', altEng: ' ', valRus: 'ALT', altRus: ' ', type: 'special-alt',
   },
   {
-    id: 'ControlRight', valEng: 'CTRL', altEng: ' ', valRus: 'CTRL', altRus: ' ', type: 'special',
+    id: 'ControlRight', valEng: 'CTRL', altEng: ' ', valRus: 'CTRL', altRus: ' ', type: 'special-ctrl',
   },
   {
     id: 'ArrowLeft', valEng: '\u02c2', altEng: ' ', valRus: '\u02c2', altRus: ' ', type: 'special-arrow',
@@ -209,11 +212,9 @@ const KEYBOARD = {
       const keyboardElement = document.createElement('button');
       keyboardElement.setAttribute('type', 'button');
       keyboardElement.classList.add('key');
-      if (key.type === 'special') {
-        keyboardElement.classList.add('key_middle', 'key-special');
-      } else if (key.type === 'special-space') {
-        keyboardElement.classList.add('key_extra');
-      }
+      if (key.type === 'special') keyboardElement.classList.add('key_middle', 'key-special');
+      else if (key.type === 'special-space') keyboardElement.classList.add('key_extra');
+      else if (key.type === 'special-ctrl') keyboardElement.classList.add('key_ctrl');
       if (lang === 'eng') {
         keyboardElement.setAttribute('value', key.valEng);
         keyboardElement.setAttribute('name', key.altEng);
@@ -254,7 +255,7 @@ const KEYBOARD = {
     this.elements.section = document.createElement('section');
     this.elements.keysContainer = document.createElement('div');
     const text = document.createElement('p');
-    text.innerText = 'Клавиатура создана в операционной системе Windows \n Для переключения языка комбинация: левыe shift + ctrl \n Shift зажимается для удобства ввода';
+    text.innerText = 'Клавиатура создана в операционной системе Windows \n Для переключения языка комбинация: левыe ctrl + alt ';
 
     center.classList.add('center-block');
     this.elements.input.classList.add('input');
@@ -301,6 +302,9 @@ const KEYBOARD = {
     const pressed = new Set();
     this.elements.keysContainer.addEventListener('mousedown', (event) => {
       switch (event.target.id) {
+        case 'keyboard':
+          this.elements.input.value += '';
+          break;
         case 'Tab':
           this.keyTab();
           break;
@@ -320,10 +324,12 @@ const KEYBOARD = {
         case 'ShiftLeft':
         case 'ShiftRight':
           this.keyShift();
-          document.getElementById(`${event.target.id}`).classList.toggle('key_active', this.properties.shift);
           break;
         case 'Delete':
           this.keyDelete();
+          break;
+        case 'LANG':
+          this.changeLang();
           break;
         default:
           if (event.target.id === 'ControlLeft' || event.target.id === 'ControlRight' || event.target.id === 'AltLeft' || event.target.id === 'AltRight' || event.target.id === 'Meta') {
@@ -336,11 +342,13 @@ const KEYBOARD = {
           } else this.elements.input.value += event.target.value;
       }
       pressed.add(event.target.id);
-      const shift = document.getElementById('ShiftLeft').classList;
-      if (shift.contains('key_active') && pressed.has('ControlLeft')) this.changeLang();
+      if (pressed.has('AltLeft') && pressed.has('ControlLeft')) this.changeLang();
     });
     this.elements.keysContainer.addEventListener('mouseup', (event) => {
       pressed.delete(event.target.id);
+      if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
+        this.keyShift();
+      }
     });
   },
   animationButton(keyPress, bool) {
@@ -375,7 +383,6 @@ const KEYBOARD = {
                 document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.capsLock);
               } else if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
                 this.keyShift();
-                document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.shift);
               } else if (event.code === 'Delete') this.keyDelete();
               else {
                 let keyVal = '';
@@ -401,12 +408,15 @@ const KEYBOARD = {
         }
       });
       pressed.add(event.code);
-      if (pressed.has('ShiftLeft') && pressed.has('ControlLeft')) this.changeLang();
+      if (pressed.has('AltLeft') && pressed.has('ControlLeft')) this.changeLang();
     });
     document.addEventListener('keyup', (event) => {
       this.elements.keys.forEach((key) => {
         if (event.code === key.id) {
           this.animationButton(event.code, false);
+          if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+            this.keyShift();
+          }
         }
       });
       pressed.delete(event.code);

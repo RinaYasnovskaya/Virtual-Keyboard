@@ -45,14 +45,20 @@ body{
 .key_middle{
   width: 13%;
 }
+.key_ctrl{
+  width: 9%;
+}
 .key_extra {
   width: 32%;
   max-width: 500px;
-  color: #ecb390;
+  color: #e9b9b6;
 }
 .key:hover{
   transition: all 600ms ease;
   background-color: #c27f7a;
+}
+.key_extra:hover {
+  color: #c27f7a;
 }
  .key:active{
   box-shadow: none;
@@ -71,6 +77,3 @@ body{
 p{
   font-family: monospace;
 }
-/* .key-special{
-  background-color: #c99c98;
-} */
