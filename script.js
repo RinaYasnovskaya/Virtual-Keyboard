@@ -206,15 +206,22 @@ const KEYBOARD = {
     capsLock: false,
     shift: false,
     lang: 'eng',
+    animation: true, 
   },
   createKeys(keys, lang) {
     keys.forEach((key) => {
       const keyboardElement = document.createElement('button');
       keyboardElement.setAttribute('type', 'button');
       keyboardElement.classList.add('key');
-      if (key.type === 'special') keyboardElement.classList.add('key_middle', 'key-special');
-      else if (key.type === 'special-space') keyboardElement.classList.add('key_extra');
-      else if (key.type === 'special-ctrl') keyboardElement.classList.add('key_ctrl');
+      if (key.type === 'special') {
+        keyboardElement.classList.add('key_middle', 'key-special');
+      }
+      else if (key.type === 'special-space') {
+        keyboardElement.classList.add('key_extra');
+      }
+      else if (key.type === 'special-ctrl') {
+        keyboardElement.classList.add('key_ctrl');
+      }
       if (lang === 'eng') {
         keyboardElement.setAttribute('value', key.valEng);
         keyboardElement.setAttribute('name', key.altEng);
@@ -229,8 +236,12 @@ const KEYBOARD = {
     });
   },
   changeLang() {
-    if (this.properties.lang === 'eng') this.properties.lang = 'rus';
-    else this.properties.lang = 'eng';
+    if (this.properties.lang === 'eng') {
+      this.properties.lang = 'rus';
+    }
+    else { 
+      this.properties.lang = 'eng';
+    }
     this.createNewState();
     this.saveLang();
   },
@@ -255,7 +266,8 @@ const KEYBOARD = {
     this.elements.section = document.createElement('section');
     this.elements.keysContainer = document.createElement('div');
     const text = document.createElement('p');
-    text.innerText = 'Клавиатура создана в операционной системе Windows \n Для переключения языка комбинация: левыe ctrl + alt ';
+    text.innerText = `Клавиатура создана в операционной системе Windows 
+    Для переключения языка комбинация: левыe ctrl + alt `;
 
     center.classList.add('center-block');
     this.elements.input.classList.add('input');
@@ -275,85 +287,38 @@ const KEYBOARD = {
     inpuT.value = inpuT.value.substring(0, inpuT.value.length - 1);
     this.elements.input.focus();
   },
-  keyCapsLock() {
-    this.properties.capsLock = !this.properties.capsLock;
-    this.toUpAndLow();
-  },
-  keyEnter() {
-    this.elements.input.value += '\n';
-    this.elements.input.focus();
-  },
-  keySpace() {
-    this.elements.input.value += ' ';
-    this.elements.input.focus();
-  },
-  keyShift() {
-    this.properties.shift = !this.properties.shift;
-    this.toUpAndLow();
-  },
-  keyTab() {
-    this.elements.input.value += '    ';
-    this.elements.input.focus();
-  },
   keyDelete() {
     this.elements.input.setRangeText('', this.elements.input.selectionStart, this.elements.input.selectionEnd + 1, 'start');
+  },
+  switchProp(nameProp) {
+    this.properties[`${nameProp}`] = !this.properties[`${nameProp}`];
+    this.toUpAndLow();
+  },
+  enterSpace(value) {
+    this.elements.input.value += value;
+    this.elements.input.focus();
   },
   clickKeyboard() {
     const pressed = new Set();
     this.elements.keysContainer.addEventListener('mousedown', (event) => {
-      switch (event.target.id) {
-        case 'keyboard':
-          this.elements.input.value += '';
-          break;
-        case 'Tab':
-          this.keyTab();
-          break;
-        case 'Space':
-          this.keySpace();
-          break;
-        case 'Enter':
-          this.keyEnter();
-          break;
-        case 'Backspace':
-          this.keyBackspace();
-          break;
-        case 'CapsLock':
-          this.keyCapsLock();
-          document.getElementById(`${event.target.id}`).classList.toggle('key_active', this.properties.capsLock);
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          this.keyShift();
-          break;
-        case 'Delete':
-          this.keyDelete();
-          break;
-        case 'LANG':
-          this.changeLang();
-          break;
-        default:
-          if (event.target.id === 'ControlLeft' || event.target.id === 'ControlRight' || event.target.id === 'AltLeft' || event.target.id === 'AltRight' || event.target.id === 'Meta') {
-            this.elements.input.value += '';
-          } else if (this.properties.capsLock) {
-            this.elements.input.value += event.target.value.toUpperCase();
-          } else if (this.properties.shift) {
-            if (event.target.name !== ' ') this.elements.input.value += event.target.name;
-            else this.elements.input.value += event.target.value.toUpperCase();
-          } else this.elements.input.value += event.target.value;
-      }
+      this.enterValueOfKeys(event.target.id, event.target.value, event.target.name, event.target.name);
       pressed.add(event.target.id);
-      if (pressed.has('AltLeft') && pressed.has('ControlLeft')) this.changeLang();
+      if (pressed.has('AltLeft') && pressed.has('ControlLeft')) {
+        this.changeLang();
+      }
+      if (this.properties.shift) {
+        document.getElementById('ShiftLeft').classList.add('key_active');
+      } else {
+        document.getElementById('ShiftLeft').classList.remove('key_active');
+      }
     });
     this.elements.keysContainer.addEventListener('mouseup', (event) => {
       pressed.delete(event.target.id);
-      if (event.target.id === 'ShiftLeft' || event.target.id === 'ShiftRight') {
-        this.keyShift();
-      }
     });
   },
-  animationButton(keyPress, bool) {
+  animationButton(keyPress, animationIsTrue) {
     const keyAnim = document.getElementById(`${keyPress}`);
-    if (bool) {
+    if (animationIsTrue) {
       keyAnim.style.backgroundColor = '#794a46';
       keyAnim.style.boxShadow = 'none';
       keyAnim.style.color = '#df7861';
@@ -371,20 +336,9 @@ const KEYBOARD = {
       event.preventDefault();
       this.elements.keys.forEach((key) => {
         if (event.code === key.id) {
-          this.animationButton(event.code, true);
+          this.animationButton(event.code, this.properties.animation);
           KEYS.forEach((elem) => {
             if (event.code === elem.id) {
-              if (event.code === 'Tab') this.keyTab();
-              else if (event.code === 'Space') this.keySpace();
-              else if (event.code === 'Enter') this.keyEnter();
-              else if (event.code === 'Backspace') this.keyBackspace();
-              else if (event.code === 'CapsLock') {
-                this.keyCapsLock();
-                document.getElementById(`${event.code}`).classList.toggle('key_active', this.properties.capsLock);
-              } else if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
-                this.keyShift();
-              } else if (event.code === 'Delete') this.keyDelete();
-              else {
                 let keyVal = '';
                 let keyAlt = '';
                 if (this.properties.lang === 'eng') {
@@ -394,15 +348,7 @@ const KEYBOARD = {
                   keyVal = elem.valRus;
                   keyAlt = elem.altRus;
                 }
-                if (event.code === 'ControlLeft' || event.code === 'ControlRight' || event.code === 'AltLeft' || event.code === 'AltRight') {
-                  this.elements.input.value += '';
-                } else if (this.properties.capsLock) {
-                  this.elements.input.value += keyVal.toUpperCase();
-                } else if (this.properties.shift) {
-                  if (key.name !== ' ') this.elements.input.value += keyAlt;
-                  else this.elements.input.value += keyVal.toUpperCase();
-                } else this.elements.input.value += keyVal;
-              }
+                this.enterValueOfKeys(event.code, keyVal, keyAlt, key.name);
             }
           });
         }
@@ -413,14 +359,52 @@ const KEYBOARD = {
     document.addEventListener('keyup', (event) => {
       this.elements.keys.forEach((key) => {
         if (event.code === key.id) {
-          this.animationButton(event.code, false);
+          this.animationButton(event.code, !this.properties.animation);
           if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
-            this.keyShift();
+            this.switchProp('shift');
           }
         }
       });
       pressed.delete(event.code);
     });
+  },
+  enterValueOfKeys(buttonId, keyValue, keyAlt, keyName) {
+    if (buttonId === 'Tab') {
+      this.enterSpace('    ');
+    } else if (buttonId === 'Space' ) {
+      this.enterSpace(' ');
+    } else if (buttonId === 'Enter') {
+      this.enterSpace('\n');
+    } else if (buttonId === 'Backspace') {
+      this.keyBackspace();
+    } else if (buttonId === 'CapsLock') {
+      this.switchProp('capsLock');
+      document.getElementById(`${buttonId}`).classList.toggle('key_active', this.properties.capsLock);
+    } else if (buttonId === 'ShiftLeft' || buttonId === 'ShiftRight') {
+      this.switchProp('shift');
+    } else if (buttonId === 'Delete') {
+      this.keyDelete();
+    } else if (buttonId === 'LANG') {
+      this.changeLang();
+    } else if (!buttonId || buttonId === 'keyboard') {
+      this.elements.input.value += '';
+    } else {
+      if (buttonId === 'ControlLeft' || buttonId === 'ControlRight' || 
+      buttonId === 'AltLeft' || buttonId === 'AltRight') {
+            this.elements.input.value += '';
+          } else if (this.properties.capsLock) {
+            this.elements.input.value += keyValue.toUpperCase();
+          } else if (this.properties.shift) {
+            if (keyName !== ' ') {
+              this.elements.input.value += keyAlt;
+            }
+            else {
+              this.elements.input.value += keyValue.toUpperCase();
+            }
+          } else {
+            this.elements.input.value += keyValue;
+          }
+    }
   },
   toUpAndLow() {
     document.querySelectorAll('.key').forEach((elem) => {
